@@ -1,7 +1,9 @@
 param(
     [string]$RepoName = "zombie-fps-stage1",
     [ValidateSet("public", "private")]
-    [string]$Visibility = "public"
+    [string]$Visibility = "public",
+    [ValidateSet("https", "ssh")]
+    [string]$Protocol = "https"
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,9 +16,15 @@ if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
 
 $auth = gh auth status 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "GitHub 로그인이 필요합니다. 아래 명령을 실행한 뒤 다시 시도하세요."
-    Write-Host "  gh auth login"
+    Write-Host "GitHub 로그인이 필요합니다."
+    Write-Host "  OAuth: gh auth login  (HTTPS + Login with a web browser)"
+    Write-Host "  SSH:   gh auth login  (SSH 선택 후 키 등록)"
+    Write-Host "  자세히: docs/GITHUB_SETUP.md"
     exit 1
+}
+
+if ($Protocol -eq "ssh") {
+    gh auth setup-git 2>$null
 }
 
 if (-not (Test-Path ".git")) {
@@ -36,11 +44,25 @@ if ($LASTEXITCODE -eq 0) {
     exit 0
 }
 
-Write-Host "GitHub 저장소 생성: $RepoName ($Visibility)"
+Write-Host "GitHub 저장소 생성: $RepoName ($Visibility, $Protocol)"
+
+if ($Protocol -eq "ssh") {
+    gh config set git_protocol ssh
+}
+
 gh repo create $RepoName --$Visibility --source=. --remote=origin --push
 
 if ($LASTEXITCODE -eq 0) {
+    if ($Protocol -eq "ssh") {
+        $sshUrl = gh repo view --json sshUrl -q .sshUrl
+        if ($sshUrl) {
+            git remote set-url origin $sshUrl
+        }
+    }
     $url = gh repo view --json url -q .url
     Write-Host ""
     Write-Host "완료: $url"
+    if ($Protocol -eq "ssh") {
+        Write-Host "Remote (SSH): $(git remote get-url origin)"
+    }
 }

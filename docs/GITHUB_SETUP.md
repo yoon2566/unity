@@ -1,20 +1,93 @@
 # GitHub에 올리기
 
-로컬 프로젝트는 이미 `git init` + 첫 커밋까지 완료된 상태입니다.  
-아래 **한 번만** GitHub 로그인 후 실행하면 public 저장소가 생성되고 push 됩니다.
+로컬 프로젝트는 이미 `git init` + 첫 커밋까지 완료된 상태입니다.
 
-## 1. GitHub 로그인 (최초 1회)
+## OAuth vs SSH — 뭘 쓸까?
 
-PowerShell에서:
+| | **OAuth (브라우저 로그인)** | **SSH** |
+|---|---------------------------|---------|
+| 난이도 | 쉬움 (추천) | 키 생성·등록 필요 |
+| 설정 | `gh auth login` 한 번 | `ssh-keygen` + GitHub에 공개키 등록 |
+| 이 프로젝트 push | `push-to-github.ps1` 바로 사용 | `-Protocol ssh` 옵션 사용 |
+| 장점 | 5분 안에 끝, gh·git 둘 다 연동 | PC마다 키만 있으면 비밀번호 없이 push |
+| 단점 | 토큰 만료 시 재로그인 | 초기 설정이 조금 더 김 |
+
+**지금 한 번 올리기만 하면 된다** → **OAuth**  
+**앞으로 git을 자주 쓸 예정** → **SSH**도 좋음
+
+---
+
+## 방법 A: OAuth (추천)
+
+### 1. GitHub 로그인 (최초 1회)
 
 ```powershell
 gh auth login
 ```
 
-- GitHub.com 선택
-- HTTPS
-- **Login with a web browser** 권장
-- 안내에 따라 브라우저에서 인증
+선택 순서:
+
+1. `GitHub.com`
+2. `HTTPS`
+3. `Login with a web browser` (OAuth)
+4. 브라우저에서 승인
+
+### 2. 저장소 생성 + push
+
+```powershell
+cd C:\Users\User\3d
+.\scripts\push-to-github.ps1
+```
+
+---
+
+## 방법 B: SSH
+
+### 1. SSH 키 만들기 (없을 때만)
+
+```powershell
+ssh-keygen -t ed25519 -C "your_email@example.com" -f "$env:USERPROFILE\.ssh\id_ed25519_github"
+```
+
+Enter 두 번 (패스프레이즈 없이도 가능).
+
+### 2. 공개키를 GitHub에 등록
+
+```powershell
+Get-Content "$env:USERPROFILE\.ssh\id_ed25519_github.pub" | Set-Clipboard
+```
+
+GitHub → **Settings → SSH and GPG keys → New SSH key** → 붙여넣기 → 저장
+
+### 3. ssh-agent에 키 등록 (Windows)
+
+```powershell
+Get-Service ssh-agent | Set-Service -StartupType Manual
+Start-Service ssh-agent
+ssh-add "$env:USERPROFILE\.ssh\id_ed25519_github"
+```
+
+### 4. gh도 SSH로 로그인
+
+```powershell
+gh auth login
+```
+
+선택 순서:
+
+1. `GitHub.com`
+2. **`SSH`** ← 여기
+3. 기존 키 경로 확인 또는 새로 생성
+4. 브라우저 OAuth로 gh 인증 (gh CLI용, git push는 SSH 키 사용)
+
+### 5. push (SSH remote)
+
+```powershell
+cd C:\Users\User\3d
+.\scripts\push-to-github.ps1 -Protocol ssh
+```
+
+---
 
 ## 2. 저장소 생성 + push (자동)
 

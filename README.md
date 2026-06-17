@@ -1,6 +1,9 @@
-# Zombie FPS — Stage 1
+# Unity 게임 제작 노하우 — Zombie FPS Stage 1
 
-Unity 6 URP로 만든 **1인칭 좀비 슈팅** 프로토타입입니다. 에셋 스토어 없이 **기본 Primitive**만 사용합니다.
+> **저장소:** https://github.com/yoon2566/unity
+
+Unity 6 URP로 만든 **1인칭 좀비 슈팅** 프로토타입 + **처음부터 만드는 튜토리얼**입니다.  
+에셋 스토어 없이 **기본 Primitive**만 사용합니다. Grok + OpenCode + Unity MCP로 개발한 실전 예제를 담았습니다.
 
 | 항목 | 내용 |
 |------|------|

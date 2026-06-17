@@ -126,7 +126,7 @@ gh repo create zombie-fps-stage1 --public --source=. --remote=origin --push
 다른 PC에서:
 
 ```bash
-git clone https://github.com/<YOUR_USERNAME>/zombie-fps-stage1.git
+git clone git@github.com:yoon2566/unity.git
 ```
 
 Unity Hub로 폴더 열기 → `docs/QUICK_START.md` 또는 `docs/BUILD_FROM_SCRATCH.md` 참고.

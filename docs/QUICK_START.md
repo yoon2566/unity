@@ -8,8 +8,8 @@
 ## 1. 저장소 받기
 
 ```bash
-git clone <YOUR_REPO_URL>
-cd zombie-fps-stage1
+git clone git@github.com:yoon2566/unity.git
+cd unity
 ```
 
 또는 GitHub에서 **Code → Download ZIP** 후 압축 해제.
